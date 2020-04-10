@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html xmlns:horizontal="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" href="themes/myAppTheme.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+</head>
+<body>
+<!-- /Home Page -->
+<div data-role="page" id="home" style="background:#26fdf8;width:360px">
+    <div data-role="header">
+        <div class="header">
+            <h1 style="color:#33ccff;font-size:17px">Calorie Counter</h1>
+        </div>
+    </div>
+    <div data-role="header" >
+        <div class="form">
+            <h4 style="font-size:17px">What did you eat for?</h4>
+        </div>
+    </div>
+    <div data-role="navbar">
+        <ul>
+            <li><a href="#food_addition_breakfast" data-icon="grid" data-transition="slidefade" style="margin-left:0;background:yellow;color:#000000;font-family:Arial">Breakfast</a> </li>
+            <li><a href="#food_addition_lunch" data-icon="grid" data-transition="slidefade" style="margin-left:0;margin-right:0;background:#ff8a31;color:#000000;font-family:Arial">Lunch</a> </li>
+            <li><a href="#food_addition_dinner" data-icon="grid" data-transition="slidefade" style="margin-right:-1px;background:#4272fa;color:#000000;font-family:Arial, sans-serif;font-weight:bold;">Dinner</a> </li>
+        </ul>
+
+    </div>
+    <div>
+        <p>Date:<input type="date" id="date" name="date"></p>
+    </div>
+        <button data-icon="arrow-d" onclick="getWholeDay()">Get all of calories for: </button>
+    <input type="text" id="wholeDay" name="wholeDay" placeholder="Get amount for Whole Day">
+    <button data-icon="bars" onclick="getWholeDayTable()">Whole Day List</button>
+    <div class="t1">
+        <table id="t1">
+            <thead>
+            <tr><th>Food Name</th><th>Calories</th></tr>
+            <tr></tr>
+            </thead>
+            <tbody id="tableData"></tbody>
+        </table>
+    </div>
+
+    <script>
+        function getWholeDayTable(){
+               var table = document.getElementById("t1");
+               var tbody = document.getElementById("tableData");
+               $("tbody").empty();
+               var date = document.getElementById("date");
+               var listA = JSON.parse(vm.getWholeTable(date.value));
+
+               for(var i=0;i<listA.length;i++){
+                    var row = tbody.insertRow();
+
+                    for(var j =0;j<listA[i].length;j++){
+                        var col = row.insertCell(-1);
+                        col.innerHTML = listA[i][j] + "<br>";
+                    }
+                    tbody.appendChild(row);
+               }
+               table.appendChild(tbody);
+        }
+    </script>
+    <!--/getting the amount of calories for entire day by calling getWholeDay() from Java using 'vm' which was added to the JavascriptInterface-->
+    <script>
+        function getWholeDay(){
+            var date = document.getElementById("date");
+            var outputWhole = document.getElementById("wholeDay");
+            if(date.value == ""){
+                alert("No Date Set!");
+            }
+            outputWhole.value = vm.getWholeDay(date.value);
+        }
+    </script>
+    <!-- /header -->
+
+    <div data-role="footer">
+        <h4>@Calorie Counter</h4>
+    </div>
+
+</div>
+<!--/Breakfast Page -->
+<div data-role="page" id="food_addition_breakfast" style="background:#faff68">
+    <div data-role="header">
+        <h1>Food Addition</h1>
+    </div><!-- /header -->
+    <div data-role="content">
+
+        <form name="textInput" >
+
+            <input type="text" name="food_name_breakfast" id="food_name_breakfast" placeholder="Enter food's name" />
+            <input type="text" name="amount_cal" id="amount_cal_breakfast" placeholder="Enter the amount in calories"/>
+        </form>
+        <p>Date:<input type="date" id="dateBreakfast" name="dateBreakfast"/>What did you have for Lunch on:</p>
+        <div style="width=400px" id="container">
+            <button onclick="inputDataBreakfast()" name="addBtn" data-icon="plus">Add to list</button>
+            <button onclick="deleteBreakfast()" data-icon="delete">Delete food</button>
+        </div>
+
+        <button onclick="getAmountBreakfast()" data-icon="arrow-d">Get Amount Of Calories</button>
+        <div class="outputBox">
+            <input type="text" name="output" id="output" placeholder="Get amount for Breakfast" style="text-align: center;" />
+        </div>
+        <button onclick="getTableBreakfast()" data-icon="bars">Get List</button>
+        <div id="table"></div>
+        <table id="tableBreakfast">
+            <thead>
+                <th>Food Name:</th>
+                <th>Calories:</th>
+            </thead>
+            <tbody id="tableBodyB"></tbody>
+        </table>
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#home" data-transition="slidefade" data-icon="home">Home</a> </li>
+            </ul>
+        </div>
+
+<!--/ inserting data into the Database by calling inputData() from Java using 'vm' which was added to the Javascript Interface-->
+        <script>
+            function inputDataBreakfast(){
+                var food_name = document.getElementById("food_name_breakfast");
+                var food_nameStr = food_name.value;
+                var amount_cal = document.getElementById("amount_cal_breakfast");
+                var amount_calStr = amount_cal.value;
+
+                var date = document.getElementById("dateBreakfast");
+                if(date.value == ""){
+                    alert("No Date Set!");
+                }
+                vm.inputData(date.value,food_name.name,food_nameStr,amount_calStr);
+                food_name.value = "";
+                amount_cal.value = "";
+            }
+        </script>
+<!--/ getting amount of calories for breakfast on a specific date using getAmount() using 'vm' which was added to the Javascript Interface -->
+        <script>
+            function getAmountBreakfast(){
+                var outputText = document.getElementById("output");
+                var foodIdBreakfast = document.getElementById("food_name_breakfast");
+
+                var date = document.getElementById("dateBreakfast");
+                if(date.value == ""){
+                    alert("No Date Set!");
+                    }
+                outputText.value = vm.getAmount(date.value,foodIdBreakfast.name);
+            }
+        </script>
+        <script>
+            function deleteBreakfast(){
+                var foodName = document.getElementById("food_name_breakfast");
+                var date = document.getElementById("dateBreakfast");
+                var cal = document.getElementById("amount_cal_breakfast");
+                vm.delete(foodName.name,foodName.value,date.value);
+                foodName.value = "";
+                cal.value = "";
+            }
+        </script>
+
+        <script>
+            function getTableBreakfast(){
+                var table = document.getElementById("tableBreakfast");
+                var tbody = document.getElementById("tableBodyB");
+                $("tbody").empty();
+                var date = document.getElementById("dateBreakfast");
+                var foodId = document.getElementById("food_name_breakfast");
+                var listA = JSON.parse(vm.getTable(date.value,foodId.name));
+
+               for(var i=0;i<listA.length;i++){
+                    var row = tbody.insertRow();
+
+                    for(var j =0;j<listA[i].length;j++){
+                        var col = row.insertCell(-1);
+                        col.innerHTML = listA[i][j] + "<br>";
+                    }
+                    tbody.appendChild(row);
+               }
+               table.appendChild(tbody);
+            }
+        </script>
+    </div>
+    <!-- /content -->
+    <div data-role="footer">
+        <h4> @Calorie Counter</h4>
+    </div>
+    <!-- /footer -->
+</div>
+<!--/ Lunch Page-->
+<div data-role="page" id="food_addition_lunch" style="background:#ffc27c">
+    <div data-role="header">
+        <h1>Food Addition</h1>
+    </div><!-- /header -->
+    <div data-role="content">
+
+        <form name="textInput" >
+
+            <input type="text" name="food_name_lunch" id="food_name_lunch" placeholder="Enter food's name" />
+            <input type="text" name="amount_cal" id="amount_cal_lunch" placeholder="Enter the amount in calories"/>
+        </form>
+        <p>Date:<input type="date" id="dateLunch" name="dateLunch"/>What did you have for Lunch on:</p>
+        <div style="width=400px" id="containerLunch">
+            <button onclick="inputDataLunch()" name="addBtn" data-icon="plus">Add to list</button>
+            <button onclick="deleteLunch()" data-icon="delete">Delete food</button>
+        </div>
+        <button onclick="getAmountLunch()" data-icon="arrow-d">Get Amount Of Calories</button>
+        <div class="outputBoxL">
+            <input type="text" name="output" id="output2" placeholder="Get amount for Lunch" style="text-align: center;"/>
+        </div>
+        <button onclick="getTableLunch()" data-icon="bars">Get List</button>
+
+        <table id="tableLunch">
+            <thead>
+            <th>Food Name:</th>
+            <th>Calories:</th>
+            </thead>
+            <tbody id="tableBodyL"></tbody>
+        </table>
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#home" data-transition="slidefade" data-icon="home">Home</a> </li>
+            </ul>
+        </div>
+<!--/ inserting data into the Database by calling inputData() from Java using 'vm' which was added to the Javascript Interface-->
+        <script>
+            function inputDataLunch(){
+                var food_nameLunch = document.getElementById("food_name_lunch");
+                var food_nameStr = food_nameLunch.value;
+                var amount_cal = document.getElementById("amount_cal_lunch");
+                var amount_calStr = amount_cal.value;
+                //document.write(food_nameStr);
+                //document.write(amount_calStr);
+                var date = document.getElementById("dateLunch");
+                if(date.value == ""){
+                    alert("No Date Set!");
+                }
+                vm.inputData(date.value,food_nameLunch.name ,food_nameStr,amount_calStr);
+                food_nameLunch.value = "";
+                amount_cal.value = "";
+            }
+        </script>
+<!--/ getting amount of calories for Lunch on a specific date using getAmount() using 'vm' which was added to the Javascript Interface -->
+        <script>
+            function getAmountLunch(){
+                var outputText2 = document.getElementById("output2");
+                var foodIdLunch = document.getElementById("food_name_lunch");
+                var date = document.getElementById("dateLunch");
+                //not sure yet if will work
+                if(date.value == ""){
+                    alert("No Date Set!");
+                }
+                outputText2.value = vm.getAmount(date.value,foodIdLunch.name);
+            }
+        </script>
+        <script>
+            function deleteLunch(){
+                var foodName = document.getElementById("food_name_lunch");
+                var date = document.getElementById("dateLunch");
+                var cal = document.getElementById("amount_cal_lunch");
+                vm.delete(foodName.name,foodName.value,date.value);
+                foodName.value = "";
+                cal.value = "";
+            }
+        </script>
+
+        <script>
+            function getTableLunch(){
+                var table = document.getElementById("tableLunch");
+                var tbody = document.getElementById("tableBodyL");
+                $("tbody").empty();
+                var date = document.getElementById("dateLunch");
+                var foodId = document.getElementById("food_name_lunch");
+                var listA = JSON.parse(vm.getTable(date.value,foodId.name));
+
+               for(var i=0;i<listA.length;i++){
+                    var row = tbody.insertRow();
+
+                    for(var j =0;j<listA[i].length;j++){
+                        var col = row.insertCell(-1);
+                        col.innerHTML = listA[i][j] + "<br>";
+                    }
+                    tbody.appendChild(row);
+               }
+               table.appendChild(tbody);
+            }
+        </script>
+    </div>
+    <!-- /content -->
+    <div data-role="footer">
+        <h4> @ZaloopaInc</h4>
+    </div>
+    <!-- /footer -->
+
+</div>
+<!--/ Dinner Page-->
+<div data-role="page" id="food_addition_dinner" style="background:#2d5ea9">
+    <div data-role="header">
+        <h1>Food Addition</h1>
+    </div><!-- /header -->
+    <div data-role="content">
+
+        <form name="textInput" >
+
+            <input type="text" name="food_name_dinner" id="food_name_dinner" placeholder="Enter food's name" />
+            <input type="text" name="amount_cal" id="amount_cal_dinner" placeholder="Enter the amount in calories"/>
+
+        </form>
+        <p id="dateFont" class="dateFont">Date:<input type="date" id="dateDinner" name="dateDinner"/>What did you have for Dinner on:</p>
+        <div style="width=400px" id="containerDinner">
+            <button onclick="inputDataDinner()" name="addBtn" data-icon="plus">Add to list</button>
+            <button onclick="deleteDinner()" data-icon="delete">Delete food</button>
+        </div>
+
+        <button onclick="getAmountDinner()" data-icon="arrow-d">Amount Of Calories</button>
+        <div class="outputboxD">
+            <input type="text" name="output" id="output3" placeholder="Get amount for Dinner" style="text-align: center;"/>
+        </div>
+        <button onclick="getTableDinner()" data-icon="bars">Get List</button>
+
+        <table id="tableDinner">
+            <thead>
+            <th>Food Name:</th>
+            <th>Calories:</th>
+            </thead>
+            <tbody id="tableBodyD"></tbody>
+        </table>
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#home" data-transition="slidefade" data-icon="home">Home</a> </li>
+            </ul>
+        </div>
+<!--/ inserting data into the Database by calling inputData() from Java using 'vm' which was added to the Javascript Interface-->
+        <script>
+            function inputDataDinner(){
+                var food_nameDinner = document.getElementById("food_name_dinner");
+                var food_nameStr = food_nameDinner.value;
+                var amount_cal = document.getElementById("amount_cal_dinner");
+                var amount_calStr = amount_cal.value;
+                //document.write(food_nameStr);
+                //document.write(amount_calStr);
+                var date = document.getElementById("dateDinner");
+                if(date.value == ""){
+                    alert("No Date Set!");
+                }
+                vm.inputData(date.value,food_nameDinner.name,food_nameStr,amount_calStr);
+                food_nameDinner.value = "";
+                amount_cal.value = "";
+            }
+        </script>
+<!--/ getting amount of calories for Lunch on a specific date using getAmount() using 'vm' which was added to the Javascript Interface -->
+        <script>
+            function getAmountDinner(){
+                var outputText3 = document.getElementById("output3");
+                var foodIdDinner = document.getElementById("food_name_dinner");
+                //not sure yet if will work
+                var date = document.getElementById("dateDinner");
+                if(date.value != ""){
+                    alert("No Date Set!");
+                }
+                outputText3.value = vm.getAmount(date.value,foodIdDinner.name);
+            }
+        </script>
+        <script>
+            function deleteDinner(){
+                var foodName = document.getElementById("food_name_dinner");
+                var date = document.getElementById("dateDinner");
+                var cal = document.getElementById("amount_cal_dinner");
+                vm.delete(foodName.name,foodName.value,date.value);
+                foodName.value = "";
+                cal.value = "";
+            }
+        </script>
+
+        <script>
+            function getTableDinner(){
+                var table = document.getElementById("tableDinner");
+                var tbody = document.getElementById("tableBodyD");
+                $("tbody").empty();
+                var date = document.getElementById("dateDinner");
+                var foodId = document.getElementById("food_name_dinner");
+                var listA = JSON.parse(vm.getTable(date.value,foodId.name));
+
+               for(var i=0;i<listA.length;i++){
+                    var row = tbody.insertRow();
+
+                    for(var j =0;j<listA[i].length;j++){
+                        var col = row.insertCell(-1);
+                        col.innerHTML = listA[i][j] + "<br>";
+                    }
+                    tbody.appendChild(row);
+               }
+               table.appendChild(tbody);
+            }
+        </script>
+    </div>
+    <!-- /content -->
+    <div data-role="footer">
+        <h4> @Calorie Counter</h4>
+    </div>
+    <!-- /footer -->
+
+</div>
+</body>
+<style type="text/css">
+    .form div{
+        color: #e6e6e6;
+	}
+	.form h4{
+		margin-top: -1px;
+		margin-bottom: 0;
+		text-align: center;
+		color: #1cdf01;
+		background-color: #26fdf8;
+	}
+	.form input{
+		display: inline-block;
+		text-align: left;
+		float: right;
+	}
+	#container div{
+	    display: inline-block;
+	    border-collapse: collapse;
+	    font-size: 20%;
+	    height:50px;
+	    width:160px;
+	    border-radius: 20px 20px 20px 20px;
+	}
+	#containerLunch div{
+	    display: inline-block;
+	    border-collapse: collapse;
+	    font-size: 20%;
+	    height:50px;
+	    width:160px;
+	    border-radius: 20px 20px 20px 20px;
+	}
+	#containerDinner div{
+	    display: inline-block;
+	    border-collapse: collapse;
+	    font-size: 20%;
+	    height:50px;
+	    width:160px;
+	    border-radius: 20px 20px 20px 20px;
+	}
+	.outputBoxL div{
+	    border-radius: 20px 20px 20px 20px;
+	    display: block;
+
+	}
+	.outputBox div{
+        border-radius: 20px 20px 20px 20px;
+	}
+    .outputboxD div{
+        border-radius: 20px 20px 20px 20px;
+    }
+	table{
+	    border-collapse: collapse;
+	    margin: 25px 0;
+	    font-size: 0.9em;
+	    width: 330px;
+	    border-radius: 5px 5px 0 0;
+	    overflow: hidden;
+	    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+	    background-color: #e6e6e6;
+	}
+	table thead th{
+	    background-color: #009879;
+	    color: #ffffff;
+	    text-align: left;
+	    font-weight: bold;
+	}
+	table td{
+	    padding: 12px 15px;
+	}
+	table tbody tr{
+	    border-bottom: 1px solid #dddddd;
+	}
+	table tbody tr:nth-type-of(even){
+	    background-color: #f3f3f3;
+	}
+	table tbody tr:last-of-type{
+	    border-bottom: 2px solid #009879;
+	}
+	.dateFont {
+	    font-weight: bold;
+	    color: #ffffff;
+	    font-family: sans-serif;
+	}
+	.header div{
+        color: #009879
+	}
+	.header h1{
+        background-color: #009879;
+	    color: #01e3ff;
+	    text-align: center;
+	    font-size: 50px;
+	    margin-top: 0;
+	    margin-bottom: 0;
+	}
+	.t1 table{
+	    border-collapse: collapse;
+	    margin: 25px 0;
+	    font-size: 0.9em;
+	    width: 360px;
+	    border-radius: 5px 5px 0 0;
+	    overflow: hidden;
+	    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+	    background-color: #e6e6e6;
+	}
+	.t1 thead th{
+	    background-color: #009879;
+	    color: #ffffff;
+	    text-align: left;
+	    font-weight: bold;
+	}
+	.t1 td{
+	    padding: 12px 15px;
+	}
+	.t1 tbody tr{
+	    border-bottom: 1px solid #dddddd;
+	}
+	.t1 tbody tr:nth-type-of(even){
+	    background-color: #f3f3f3;
+	}
+	.t1 tbody tr:last-of-type{
+	    border-bottom: 2px solid #009879;
+	}
+
+</style>
